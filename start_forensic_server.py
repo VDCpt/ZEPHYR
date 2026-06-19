@@ -21,6 +21,8 @@ import ssl
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from pathlib import Path
+from core import ForensicEngine
+from security.chain_of_custody_hasher import ChainOfCustodyHasher
 
 # Configuração de Logging
 logging.basicConfig(
