@@ -1,0 +1,213 @@
+{
+  "contract": {
+    "name": "ZEPHYR Interface Contract",
+    "version": "3.0.0",
+    "description": "Contrato de dados para interoperabilidade entre sistemas forenses",
+    "last_updated": "2026-06-19",
+    "compliance": {
+      "ansi_nist": "ITL 1-2011",
+      "iso_iec": "19794-2",
+      "interpol": "LFFS v2.0"
+    }
+  },
+  "api_endpoints": {
+    "base_url": "https://zephyr.forensic.gov/api/v3",
+    "authentication": {
+      "method": "oauth2",
+      "token_type": "bearer",
+      "scopes": ["forensic.read", "forensic.write", "forensic.admin"]
+    },
+    "endpoints": {
+      "upload": {
+        "path": "/fingerprint/upload",
+        "method": "POST",
+        "description": "Upload de imagem de impressão digital",
+        "content_types": ["image/tiff", "image/jpeg", "image/png", "application/octet-stream"],
+        "max_size": 52428800
+      },
+      "process": {
+        "path": "/fingerprint/process/{case_id}",
+        "method": "POST",
+        "description": "Iniciar processamento forense",
+        "parameters": {
+          "case_id": "string",
+          "legal_mode": "PT/PT | EN/US",
+          "auto_generate_report": "boolean"
+        }
+      },
+      "match": {
+        "path": "/fingerprint/match/{case_id}",
+        "method": "GET",
+        "description": "Obter resultados de correspondência",
+        "parameters": {
+          "case_id": "string",
+          "include_explainability": "boolean"
+        }
+      },
+      "report": {
+        "path": "/report/generate/{case_id}",
+        "method": "POST",
+        "description": "Gerar relatório pericial",
+        "parameters": {
+          "case_id": "string",
+          "format": "pdf | json | text",
+          "language": "pt | en"
+        }
+      },
+      "validate": {
+        "path": "/fingerprint/validate/{case_id}",
+        "method": "GET",
+        "description": "Validar autenticidade da impressão",
+        "parameters": {
+          "case_id": "string",
+          "check_vitality": "boolean",
+          "check_spoofing": "boolean"
+        }
+      }
+    }
+  },
+  "data_schemas": {
+    "fingerprint_image": {
+      "type": "object",
+      "required": ["image_data", "metadata"],
+      "properties": {
+        "image_data": {
+          "type": "string",
+          "format": "base64",
+          "description": "Dados da imagem codificados em base64"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "case_id": {"type": "string"},
+            "collection_date": {"type": "string", "format": "date-time"},
+            "surface_type": {"type": "string", "enum": ["metal", "glass", "paper", "plastic", "fabric", "other"]},
+            "development_method": {"type": "string", "enum": ["powder", "chemical", "optical", "other"]},
+            "quality_score": {"type": "number", "minimum": 0, "maximum": 100},
+            "resolution_dpi": {"type": "integer"},
+            "image_format": {"type": "string", "enum": ["tiff", "jpeg", "png", "nist"]}
+          }
+        }
+      }
+    },
+    "minutiae_data": {
+      "type": "object",
+      "required": ["minutiae", "summary"],
+      "properties": {
+        "minutiae": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "integer"},
+              "x": {"type": "number"},
+              "y": {"type": "number"},
+              "angle": {"type": "number"},
+              "type": {"type": "string", "enum": ["bifurcation", "termination", "island", "dot"]},
+              "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+              "matched": {"type": "boolean"}
+            }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "properties": {
+            "total_count": {"type": "integer"},
+            "matched_count": {"type": "integer"},
+            "pattern_type": {"type": "string", "enum": ["arch", "loop", "whorl"]},
+            "henry_index": {"type": "integer"}
+          }
+        }
+      }
+    },
+    "match_result": {
+      "type": "object",
+      "required": ["case_id", "subject_id", "confidence_score", "match_type"],
+      "properties": {
+        "case_id": {"type": "string"},
+        "subject_id": {"type": "string"},
+        "subject_name": {"type": "string"},
+        "confidence_score": {"type": "number", "minimum": 0, "maximum": 100},
+        "match_type": {"type": "string", "enum": ["positive", "negative", "inconclusive"]},
+        "minutiae_matched": {"type": "integer"},
+        "total_minutiae": {"type": "integer"},
+        "pores_matched": {"type": "integer"},
+        "total_pores": {"type": "integer"},
+        "level1_confidence": {"type": "number"},
+        "level2_confidence": {"type": "number"},
+        "level3_confidence": {"type": "number"},
+        "timestamp": {"type": "string", "format": "date-time"}
+      }
+    },
+    "legal_report": {
+      "type": "object",
+      "required": ["mode", "case_id", "report_content"],
+      "properties": {
+        "mode": {"type": "string", "enum": ["PT/PT", "EN/US"]},
+        "case_id": {"type": "string"},
+        "report_content": {
+          "type": "object",
+          "properties": {
+            "header": {"type": "object"},
+            "analysis": {"type": "object"},
+            "results": {"type": "object"},
+            "conclusion": {"type": "object"},
+            "attachments": {"type": "array"}
+          }
+        },
+        "legal_framework": {
+          "type": "object",
+          "properties": {
+            "jurisdiction": {"type": "string"},
+            "compliance": {"type": "array", "items": {"type": "string"}},
+            "citations": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "id": {"type": "string"},
+              "date": {"type": "string"},
+              "signature_hash": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": {
+    "encryption": {
+      "algorithm": "AES-256-GCM",
+      "key_rotation": "24h",
+      "hash_algorithm": "SHA-3"
+    },
+    "authentication": {
+      "oauth_provider": "forensic.gov",
+      "token_expiry": "3600",
+      "refresh_token": true
+    },
+    "audit": {
+      "log_all_requests": true,
+      "retention_days": 3650,
+      "blockchain_integrity": true
+    },
+    "data_protection": {
+      "gdpr_compliant": true,
+      "data_minimization": true,
+      "anonymization": true
+    }
+  },
+  "error_responses": {
+    "400": "Bad Request - Dados inválidos",
+    "401": "Unauthorized - Autenticação necessária",
+    "403": "Forbidden - Sem permissão",
+    "404": "Not Found - Recurso não encontrado",
+    "422": "Unprocessable Entity - Erro de validação",
+    "429": "Too Many Requests - Limite excedido",
+    "500": "Internal Server Error - Erro no sistema",
+    "503": "Service Unavailable - Sistema em manutenção"
+  }
+}
