@@ -1,0 +1,63 @@
+{
+  "jurisdiction": "Portugal / União Europeia",
+  "version": "1.2.0",
+  "language": "Português",
+  "legal_basis": {
+    "ai_act": {
+      "reference": "Regulamento (UE) 2024/1689",
+      "title": "AI Act - Inteligência Artificial de Risco Elevado",
+      "annex": "Anexo III",
+      "biometric_identification": "diferida (post-hoc)",
+      "compliance_required": true,
+      "human_supervision": "obrigatória"
+    },
+    "criminal_procedure": {
+      "reference": "Artigo 163.º CPP",
+      "title": "Valor da prova pericial",
+      "description": "A prova pericial é livremente apreciada pelo juiz"
+    },
+    "data_protection": {
+      "reference": "Lei n.º 59/2019",
+      "title": "Transposição da Diretiva (UE) 2016/680",
+      "scope": "Dados pessoais no âmbito penal"
+    },
+    "cybersecurity": {
+      "reference": "Decreto-Lei n.º 125/2025",
+      "title": "Transposição da Diretiva NIS2",
+      "authority": "CNCS - Centro Nacional de Cibersegurança"
+    }
+  },
+  "report_template": {
+    "title": "Parecer Técnico Forense",
+    "required_sections": [
+      "Identificação do Processo",
+      "Sumário Executivo",
+      "Metodologia",
+      "Análise Detalhada",
+      "Resultados Estatísticos",
+      "IA Explicável (XAI)",
+      "Conclusão",
+      "Enquadramento Legal",
+      "Assinaturas"
+    ],
+    "language_style": "formal",
+    "jargon_level": "moderado"
+  },
+  "biometric_processing": {
+    "legal_justification": "interesse público",
+    "data_minimization": true,
+    "retention_policy": "5 anos após arquivamento do processo",
+    "anonymization": "após 10 anos"
+  },
+  "audit_requirements": {
+    "logs_retention": "10 anos",
+    "human_review_threshold": 0.999,
+    "audit_frequency": "trimestral",
+    "authority": "CNCS"
+  },
+  "signatures": {
+    "expert_title": "Perito(a) Responsável",
+    "coordinator_title": "Coordenador do Laboratório",
+    "judge_title": "Juiz (para ciência)"
+  }
+}
